@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CertificateVerify | Verification Result</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">CertificateVerify</div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/verify">Verify Certificate</a>
+        </div>
+    </nav>
+
+    <!-- Verification Result -->
+    <section class="result-section">
+
+        <div class="result-container">
+
+            <!-- Status -->
+            <div class="result-status">
+
+                <div class="status-icon">✓</div>
+
+                <p class="eyebrow">VERIFICATION RESULT</p>
+
+                <h1>Certificate Verified</h1>
+
+                <p>
+                    {{ certificate.get('message',
+                    'Certificate verified successfully.') }}
+                </p>
+
+            </div>
+
+            <!-- Certificate Details -->
+            <div class="certificate-details">
+
+                <div class="details-heading">
+
+                    <h2>Certificate Details</h2>
+
+                    <span class="verified-badge">
+                        VERIFIED
+                    </span>
+
+                </div>
+
+                <div class="details-grid">
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Certificate ID
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('certificate_id', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Institution / University
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('institution_name', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Certificate Holder
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('student_name', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Course
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('course', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Certificate Type
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('certificate_type', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Issue Date
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('issue_date', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Completion Year
+                        </span>
+
+                        <strong>
+                            {{ certificate.get('completion_year', 'N/A') }}
+                        </strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            Verification Method
+                        </span>
+
+                        <strong>
+                            {{ verification_method }}
+                        </strong>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Integrity Status -->
+            <div class="integrity-box">
+
+                <div>
+                    <span class="detail-label">
+                        Certificate Integrity
+                    </span>
+
+                    <strong>
+                        {% if certificate.get('integrity_check') == 'PASSED' %}
+                            ✓ Integrity Check Passed
+                        {% else %}
+                            Integrity Check Not Confirmed
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <p>
+                    The integrity status is based on the response
+                    received from the institution's verification API.
+                </p>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="result-actions">
+
+                <a href="/verify" class="primary-button">
+                    Verify Another Certificate
+                </a>
+
+                <a href="/" class="secondary-button">
+                    Back to Home
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>
+            © 2026 CertificateVerify.
+            Distributed Certificate Verification System.
+        </p>
+    </footer>
+
+</body>
+</html>

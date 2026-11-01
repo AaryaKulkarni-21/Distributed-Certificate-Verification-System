@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CertificateVerify | Verification Failed</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            CertificateVerify
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/verify">Verify Certificate</a>
+        </div>
+
+    </nav>
+
+    <!-- Invalid Verification Result -->
+    <section class="result-section">
+
+        <div class="result-container">
+
+            <div class="result-status">
+
+                <div class="status-icon">✕</div>
+
+                <p class="eyebrow">
+                    VERIFICATION RESULT
+                </p>
+
+                <h1>Verification Failed</h1>
+
+                <p>
+                    {{ message | default('The certificate could not be verified.', true) }}
+                </p>
+
+            </div>
+
+            <div class="integrity-box">
+
+                <div>
+                    <span class="detail-label">
+                        Verification Status
+                    </span>
+
+                    <strong>
+                        Certificate Not Verified
+                    </strong>
+                </div>
+
+                <p>
+                    Please check the Certificate ID and the details
+                    entered. If the problem continues, contact the
+                    issuing institution.
+                </p>
+
+            </div>
+
+            <div class="result-actions">
+
+                <a href="/verify" class="primary-button">
+                    Try Again
+                </a>
+
+                <a href="/" class="secondary-button">
+                    Back to Home
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <p>
+            © 2026 CertificateVerify.
+            Distributed Certificate Verification System.
+        </p>
+
+    </footer>
+
+</body>
+</html>

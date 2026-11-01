@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CertificateVerify | Verify Certificate</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">CertificateVerify</div>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/verify">Verify Certificate</a>
+        </div>
+    </nav>
+
+    <section class="verification-section">
+        <div class="verification-container">
+
+            <p class="eyebrow">CERTIFICATE VERIFICATION</p>
+
+            <h1>Verify a Certificate</h1>
+
+            <p class="verification-description">
+                Enter the certificate details below to verify
+                its authenticity and retrieve the verified information.
+            </p>
+
+            <form class="verificationform"
+                  action="/result"
+                  method="GET"
+                  id="verificationForm">
+
+                <div class="form-group">
+                    <label for="certificate_id">Certificate ID</label>
+
+                    <input
+                        type="text"
+                        id="certificate_id"
+                        name="certificate_id"
+                        placeholder="Enter Certificate ID"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="institution">
+                        Institution / University Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="institution"
+                        name="institution"
+                        placeholder="Enter Institution or University Name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="holder_name">
+                        Certificate Holder Name
+                        <span>(Additional)</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="holder_name"
+                        name="holder_name"
+                        placeholder="Enter Certificate Holder Name">
+                </div>
+
+                <button type="submit"
+                        class="primary-button verify-button">
+                    Verify Certificate
+                </button>
+
+            </form>
+
+            <!-- QR Verification -->
+            <!-- Certificate Upload and QR Verification -->
+
+<div class="qr-section">
+
+    <div class="divider">
+        <span>OR</span>
+    </div>
+
+    <h3>Upload Certificate for Verification</h3>
+
+    <p>
+        Upload a certificate image containing a QR code.
+        The system will automatically scan and verify the certificate.
+    </p>
+
+    <input
+        type="file"
+        id="certificateFile"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+        hidden
+    >
+
+    <button
+        type="button"
+        class="qr-button"
+        id="uploadButton">
+        Upload Certificate
+    </button>
+
+    <p id="uploadMessage" role="status" aria-live="polite"></p>
+
+    <div id="uploadPreview" style="display:none; margin-top:20px;">
+        <img
+            id="certificatePreview"
+            alt="Uploaded certificate preview"
+            style="max-width:100%; max-height:350px; border-radius:8px;"
+        >
+    </div>
+
+    <div id="qr-file-reader" style="display:none;"></div>
+
+</div>
+
+                <p id="qr-message"
+                   role="status"
+                   style="margin-top:12px;">
+                </p>
+
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>
+            © 2026 CertificateVerify.
+            Distributed Certificate Verification System.
+        </p>
+    </footer>
+
+    <script>
+    const uploadButton = document.getElementById("uploadButton");
+    const certificateFile = document.getElementById("certificateFile");
+    const uploadMessage = document.getElementById("uploadMessage");
+    const uploadPreview = document.getElementById("uploadPreview");
+    const certificatePreview = document.getElementById("certificatePreview");
+
+    let qrReader = null;
+    let verificationStarted = false;
+
+    const institutions = {
+        "UNI-A": "Sunrise Institute of Technology",
+        "UNI-B": "Greenfield College",
+        "UNI-C": "Western Valley University"
+    };
+
+    uploadButton.addEventListener("click", function () {
+        certificateFile.click();
+    });
+
+    certificateFile.addEventListener("change", async function () {
+        const file = certificateFile.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        verificationStarted = false;
+        uploadButton.disabled = true;
+        uploadMessage.textContent = "Reading QR code from certificate...";
+        uploadPreview.style.display = "none";
+
+        if (!file.type.startsWith("image/")) {
+            uploadMessage.textContent =
+                "Please upload a JPG, PNG, or WEBP certificate image.";
+            uploadButton.disabled = false;
+            return;
+        }
+
+        certificatePreview.src = URL.createObjectURL(file);
+        uploadPreview.style.display = "block";
+
+        try {
+            if (typeof Html5Qrcode === "undefined") {
+                throw new Error(
+                    "QR scanning library could not load. Check your internet connection."
+                );
+            }
+
+            if (!qrReader) {
+                qrReader = new Html5Qrcode("qr-file-reader");
+            }
+
+            // Read QR code directly from the uploaded image.
+            const decodedText = await qrReader.scanFile(file, true);
+
+            const certificateId = extractCertificateId(decodedText);
+
+            if (!certificateId) {
+                throw new Error(
+                    "No supported Certificate ID was found in the QR code."
+                );
+            }
+
+            const institutionCode = certificateId
+                .split("-")
+                .slice(0, 2)
+                .join("-");
+
+            const institutionName = institutions[institutionCode];
+
+            if (!institutionName) {
+                throw new Error(
+                    "The QR code belongs to an unsupported institution."
+                );
+            }
+
+            document.getElementById("certificate_id").value = certificateId;
+            document.getElementById("institution").value = institutionName;
+
+            uploadMessage.textContent =
+                "QR detected. Verifying certificate automatically...";
+
+            verificationStarted = true;
+
+            // Submit the existing form automatically.
+            document.getElementById("verificationForm").requestSubmit();
+
+        } catch (error) {
+            console.error(error);
+
+            uploadMessage.textContent =
+                error.message ||
+                "Could not read the QR code. Upload a clearer certificate image.";
+
+            uploadButton.disabled = false;
+        }
+    });
+
+    function extractCertificateId(decodedText) {
+        const value = decodedText.trim();
+
+        // QR may contain a plain ID or a URL.
+        try {
+            const url = new URL(value);
+            const idFromQuery = url.searchParams.get("certificate_id");
+
+            if (idFromQuery) {
+                return normalizeCertificateId(idFromQuery);
+            }
+
+            const lastPart = url.pathname.split("/").filter(Boolean).pop();
+
+            if (lastPart) {
+                const id = normalizeCertificateId(lastPart);
+
+                if (id) {
+                    return id;
+                }
+            }
+        } catch (error) {
+            // The QR may contain a plain Certificate ID.
+        }
+
+        return normalizeCertificateId(value);
+    }
+
+    function normalizeCertificateId(value) {
+        const id = value.trim().toUpperCase();
+
+        return /^UNI-[ABC]-\d{4}-\d+$/.test(id) ? id : null;
+    }
+</script>
+
+</body>
+</html>
